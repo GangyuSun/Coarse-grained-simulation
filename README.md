@@ -32,15 +32,24 @@ $ gmx_mpi grompp -p topol.top -f ../minimization.mdp -c complex_cg.gro -o minimi
 
 $ gmx_mpi mdrun -deffnm minimization-complex
 ```
-##### 3. Solvate the system
+##### 3. Solvate the system and adding counter ions
  Solvate the system with `gmx solvate` (an equilibrated water box can be downloaded [here](http://md.chem.rug.nl/index.php/downloads/example-applications/63-pure-water-solvent); it is called water.gro. Make sure the box size is large enough (i.e. there is enough water around the molecule to avoid periodic boundaries artifacts) and remember to use a larger van der Waals distance when solvating to avoid clashes, e.g.:
  ```shell
  $ gmx_mpi solvate -cp minimization-complex.gro -cs ../water.gro -radius 0.21 -o solv.gro -p topol.top
  ```
+ Adding 0.15M NaCl and neutralzing system 
+ ```shell
+ $ gmx_mpi grompp -f ../minimization.mdp -c solv.gro -p topol.top -o em.tpr
+ 
+ $ gmx_mpi genion -s em.tpr -p topol.top -o solv_ions.gro -pname NA+ -nname Cl- -neutral -conc 0.15
+ ```
+ - using minimization.mdp as ions.mdp
  check the *top file at end and make sure there are no mistakes in the top file.
  
 ##### 4. Energy minimization and position-restrained (NPT) equilibration
 you will then do a short energy minimization and position-restrained (NPT) equilibration of the solvated system. Since the martinize.py script already generated position restraints (thanks to the `-p` flag), all you have to do is specify `define = -DPOSRES` in your parameter file (`.mdp`). At this point you must also add the appropriate number of water beads to your system topology (`.top`):
 ```shell
-$ 
- 
+$ gmx_mpi grompp -p topol.top -c solv_ions.gro -f ../minimization.mdp -o em.tpr
+
+$ gmx_mpi mdrun -deffnm em -v
+```
