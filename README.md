@@ -45,7 +45,7 @@ $ gmx_mpi mdrun -deffnm minimization-complex
  ```
  - using minimization.mdp as ions.mdp
  check the *top file at end and make sure there are no mistakes in the top file.
- 
+ Be careful that the atom name between `top` file and `gro` maybe different, in my case, for example, the some NA and CL names in the `gro` file are "NA" but not "NA+". so we must replace "NA" and "CL" to "NA+" and "CL-" to make it as same as `CG_ions.itp` as well as `top` file.
 ##### 4. Energy minimization and position-restrained (NPT) equilibration
 you will then do a short energy minimization and position-restrained (NPT) equilibration of the solvated system. Since the martinize.py script already generated position restraints (thanks to the `-p` flag), all you have to do is specify `define = -DPOSRES` in your parameter file (`.mdp`). At this point you must also add the appropriate number of water beads to your system topology (`.top`):
 ```shell
