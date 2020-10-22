@@ -4,7 +4,7 @@
 It's easily to position proteins around a target protein by using the internal gromacs command `gmx insert-molecules`.
 a simple command might look like:
 ```shell
-$ insert-molecules -f norrin_fzd4crd.pdb -ci lrp6_bp12.pdb -radius 0.6 -o complex.pdb -nmol 2 -try 10000 -box 10
+$ gmx_mpi insert-molecules -f norrin_fzd4crd.pdb -ci lrp6_bp12.pdb -radius 0.6 -o complex.pdb -nmol 2 -try 10000 -box 10
 ```
 -f indicates the target protein and -ci terms to which protein you wanna to add. then you can declare the vdw distance between the target protein and added protein by the `-radius` tag, in my case which is 0.6 nanometers. And you can also decide how many proteins u want to add around the target protein by `-nmol` tag and `-try` lots of times to ensure that u can successfully insert the proteins in you system. Also the box size must be declare by `-box` tag.
 
