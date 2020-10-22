@@ -28,18 +28,18 @@ Do a short (ca. 10-100 steps is enough!) minimization in vacuum. Before you can 
 ```shell
 $ gmx_mpi editconf -f complex_cg.pdb -d 5 -bt cubic -o complex_cg.gro
 
-$ gmx_mpi grompp -p topol.top -f ../minimization.mdp -c complex_cg.gro -o minimization-complex.tpr
+$ gmx_mpi grompp -p topol.top -f minimization.mdp -c complex_cg.gro -o minimization-complex.tpr
 
 $ gmx_mpi mdrun -deffnm minimization-complex
 ```
 #### 3. Solvate the system and adding counter ions
  Solvate the system with `gmx solvate` (an equilibrated water box can be downloaded [here](http://md.chem.rug.nl/index.php/downloads/example-applications/63-pure-water-solvent); it is called water.gro. Make sure the box size is large enough (i.e. there is enough water around the molecule to avoid periodic boundaries artifacts) and remember to use a larger van der Waals distance when solvating to avoid clashes, e.g.:
  ```shell
- $ gmx_mpi solvate -cp minimization-complex.gro -cs ../water.gro -radius 0.21 -o solv.gro -p topol.top
+ $ gmx_mpi solvate -cp minimization-complex.gro -cs water.gro -radius 0.21 -o solv.gro -p topol.top
  ```
  Adding 0.15M NaCl and neutralzing system 
  ```shell
- $ gmx_mpi grompp -f ../minimization.mdp -c solv.gro -p topol.top -o em.tpr
+ $ gmx_mpi grompp -f minimization.mdp -c solv.gro -p topol.top -o em.tpr
  
  $ gmx_mpi genion -s em.tpr -p topol.top -o solv_ions.gro -pname NA+ -nname Cl- -neutral -conc 0.15
  ```
@@ -49,11 +49,11 @@ $ gmx_mpi mdrun -deffnm minimization-complex
 #### 4. Energy minimization and position-restrained (NPT) equilibration
 you will then do a short energy minimization and position-restrained (NPT) equilibration of the solvated system. Since the martinize.py script already generated position restraints (thanks to the `-p` flag), all you have to do is specify `define = -DPOSRES` in your parameter file (`.mdp`). At this point you must also add the appropriate number of water beads to your system topology (`.top`):
 ```shell
-$ gmx_mpi grompp -p topol.top -c solv_ions.gro -f ../minimization.mdp -o em.tpr
+$ gmx_mpi grompp -p topol.top -c solv_ions.gro -f minimization.mdp -o em.tpr
 
 $ gmx_mpi mdrun -deffnm em -v
 
-$ gmx_mpi grompp -p topol.top -c em.gro -r em.gro -f ../equilibration.mdp -o npt.tpr -maxwarn 2
+$ gmx_mpi grompp -p topol.top -c em.gro -r em.gro -f equilibration.mdp -o npt.tpr -maxwarn 2
 
 $ gmx_mpi mdrun -deffnm npt -v
 ```
@@ -61,3 +61,10 @@ $ gmx_mpi mdrun -deffnm npt -v
    - LINCS warning ocurred:
      try to increase tau_t, at least 1(ps). In my case, the `tau_t` was set to `4`, then the LINCS warning was eliminated. There are some other things might also cause the LINCS or SHAKE errors, please refer to [Dealing with LINCS/SHAKE warnings](https://www.jianshu.com/p/44b27d310970?utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation)
     
+#### 5. Start production run (without position restraints!)
+if your simulation crashes, some more equilibration steps might be needed. NOTE that you will get a warning about simultaneous use of Parrinello-Rahman barostat and newly generated velocties. This can be ignored by the -maxwarn 1 option. 
+```shell
+$ gmx_mpi grompp -p topol.top -c npt.gro -f dynamic.mdp -o dynamic.tpr -maxwarn 1
+
+$ gmx_mpi deffnm dynamic -v
+```
