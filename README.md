@@ -52,4 +52,12 @@ you will then do a short energy minimization and position-restrained (NPT) equil
 $ gmx_mpi grompp -p topol.top -c solv_ions.gro -f ../minimization.mdp -o em.tpr
 
 $ gmx_mpi mdrun -deffnm em -v
+
+$ gmx_mpi grompp -p topol.top -c em.gro -r em.gro -f ../equilibration.mdp -o npt.tpr -maxwarn 2
+
+$ gmx_mpi mdrun -deffnm npt -v
 ```
+   In `grompp` if you need to position restraint the coords then must add `-r *gro` arg.
+   - LINCS warning ocurred:
+     try to increase tau_t, at least 1(ps). In my case, the `tau_t` was set to `4`, then the LINCS warning was eliminated. There are some other things might also cause the LINCS or SHAKE errors, please refer to [Dealing with LINCS/SHAKE warnings](https://www.jianshu.com/p/44b27d310970?utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation)
+    
