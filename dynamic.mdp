@@ -15,8 +15,8 @@ title                    = Martini
 ; Time steps smaller than 20 fs are not required unless specifically stated in the itp file.
 
 integrator               = md    
-dt                       = 0.03  
-nsteps                   = 3000000
+dt                       = 0.02  
+nsteps                   = 4000000000
 nstcomm                  = 100
 comm-grps		         = 
 
@@ -25,7 +25,7 @@ nstvout                  = 0
 nstfout                  = 0
 nstlog                   = 100000
 nstenergy                = 100
-nstxout-compressed       = 5000
+nstxout-compressed       = 1000
 compressed-x-precision   = 100
 compressed-x-grps        = 
 energygrps               = 
@@ -61,12 +61,12 @@ pbc                      = xyz
 verlet-buffer-tolerance  = 0.005
 
 coulombtype              = reaction-field 
-rcoulomb                 = 1.1
+rcoulomb                 = 1.2
 epsilon_r                = 15	; 2.5 (with polarizable water)
 epsilon_rf               = 0
 vdw_type                 = cutoff  
 vdw-modifier             = Potential-shift-verlet
-rvdw                     = 1.1
+rvdw                     = 1.2
 
 ; MARTINI and TEMPERATURE/PRESSURE
 ; normal temperature and pressure coupling schemes can be used. 
@@ -88,18 +88,18 @@ rvdw                     = 1.1
 ; coupling should be done semiisotropic.
 
 tcoupl                   = v-rescale 
-tc-grps                  = system 
-tau_t                    = 1.0   
-ref_t                    = 300 
+tc-grps                  = Protein non-Protein 
+tau_t                    = 4 4   
+ref_t                    = 323 323 
 Pcoupl                   = parrinello-rahman 
 Pcoupltype               = isotropic
 tau_p                    = 12.0 ; 12.0  ;parrinello-rahman is more stable with larger tau-p, DdJ, 20130422
 compressibility          = 3e-4 ;  3e-4
 ref_p                    = 1.0  ; 1.0
 
-gen_vel                  = yes
-gen_temp                 = 300
-gen_seed                 = 473529
+gen_vel                  = no
+gen_temp                 = 323
+continuation             = yes
 
 ; MARTINI and CONSTRAINTS 
 ; for ring systems and stiff bonds constraints are defined
